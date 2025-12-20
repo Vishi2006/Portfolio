@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+  overflow: hidden;
+}
+
+body {
+  overflow: hidden;
+}
+
+[data-scroll-container] {
+  overflow: hidden;
+}
+
+/* Prevent horizontal overflow on mobile */
+body, html {
+  overflow-x: hidden;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Smooth transitions for all interactive elements */
+a, button {
+  transition: all 0.3s ease;
+}
+
+@font-face {
+  font-family: 'Doto';
+  src: url('../src/assets/fonts/Doto-VariableFont_ROND\,wght.ttf') format('truetype');
+  font-weight: 100 900; /* variable font range */
+  font-style: normal;
+}
+
+/* Color Scheme 1: Modern Dark with Green Accents */
+:root {
+  --primary-bg: #1B1B1B;
+  --secondary-bg: #2D2D2D;
+  --accent-green: #90EE90;
+  --accent-green-dark: #32CD32;
+  --text-primary: #F0F0F0;
+  --text-secondary: #B0B0B0;
+}
+
+
+#mainDiv{
+  position: relative;
+  perspective: 1000px;
+}
+
+#textstructure{
+  width: fit-content;
+}
