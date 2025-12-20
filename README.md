@@ -37,6 +37,7 @@ portfolio/
 │   │   ├── About.jsx
 │   │   ├── Contact.jsx
 │   │   ├── LandingPage.jsx
+|   |   |-- LoadingPage.jsx
 │   │   ├── Navbar.jsx
 │   │   ├── Project.jsx
 │   │   └── Tech.jsx
