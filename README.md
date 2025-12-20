@@ -70,8 +70,8 @@ portfolio/
 
 **Pulkit Khowal**
 - Portfolio: [Your Portfolio URL]
-- GitHub: [@yourusername](https://github.com/Vishi2006)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/pulkit-khowal)
+- GitHub: [@Vishi2006](https://github.com/Vishi2006)
+- LinkedIn: [Pulkit Khowal](https://linkedin.com/in/pulkit-khowal)
 
 ## 🙏 Acknowledgments
 
