@@ -6,7 +6,7 @@ const Navbar = () => {
   
   const handleResumeDownload = () => {
     const link = document.createElement('a');
-    link.href = '/resume.pdf'; 
+    link.href = '/Pulkit-Khowal-Resume.pdf'; 
     link.download = 'Pulkit_Khowal_Resume.pdf';
     link.click();
   };
