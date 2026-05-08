@@ -1,37 +1,58 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 import { MdOutlineFileDownload } from "react-icons/md";
 
-
 const Navbar = () => {
-  
-  const handleResumeDownload = () => {
-    const link = document.createElement('a');
-    link.href = '/Pulkit-Khowal-Resume.pdf'; 
-    link.download = 'Pulkit_Khowal_Resume.pdf';
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleResume = () => {
+    const link = document.createElement("a");
+    link.href = "/Pulkit-Khowal-Resume.pdf";
+    link.download = "Pulkit_Khowal_Resume.pdf";
     link.click();
   };
 
   return (
-    <div className='sticky top-0 w-full px-4 sm:px-6 md:px-8 lg:px-20 py-4 sm:py-6 flex justify-between items-center shadow-lg border-b border-green-500/70 bg-black z-[20]'>
-      {/* Logo */}
-      <div className="logo">
-        <h1 className="font-[Doto] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300 cursor-pointer">
-          Pulkit Khowal
-        </h1>
-      </div>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
+        scrolled
+          ? "py-3 bg-black/70 backdrop-blur-xl border-b border-green-500/10 shadow-[0_4px_30px_rgba(0,255,0,0.04)]"
+          : "py-4 bg-transparent"
+      }`}
+    >
+      <div className="max-w-[1400px] mx-auto section-container flex items-center justify-between">
+        {/* Logo */}
+        <a
+          href="#hero"
+          onClick={(e) => { e.preventDefault(); document.querySelector("#hero")?.scrollIntoView({ behavior: "smooth" }); }}
+          className="font-[Doto] text-2xl sm:text-3xl font-extrabold uppercase"
+          style={{
+            background: "linear-gradient(135deg, #39ff14, #00cc00)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+          data-cursor-hover
+        >
+          Pulkit Khowal - A Developer
+        </a>
 
-      {/* Resume Download Button */}
-      <div className='links'>
+        {/* Resume button — properly padded */}
         <button
-          onClick={handleResumeDownload}
-          className='font-[Doto] font-extrabold uppercase group text-base sm:text-lg md:text-xl lg:text-2xl h-10 sm:h-12 px-4 sm:px-6 flex items-center gap-2 sm:gap-3 rounded-full bg-green-500/80 hover:bg-zinc-700 hover:text-green-500 text-black  transition-all duration-300 transform '
+          onClick={handleResume}
+          hero-cta-hover
+          className="hero-cta-primary"
         >
           <span>Resume</span>
-          <MdOutlineFileDownload className="text-xl sm:text-2xl group-hover:animate-bounce" />
+          <MdOutlineFileDownload size={18} />
         </button>
       </div>
-    </div>
-  )
-}
+    </nav>
+  );
+};
 
 export default Navbar;

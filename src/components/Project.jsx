@@ -1,147 +1,290 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
+gsap.registerPlugin(ScrollTrigger);
 
-const Projects = () => {
-  const [hoveredProject, setHoveredProject] = useState(null);
+const PROJECTS = [
+  {
+    id: "01",
+    title: "Placement Management System",
+    description:
+      "Comprehensive campus recruitment platform with student profiles, job postings, application tracking, and interview scheduling for efficient hiring workflow.",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    image: "/project6.png",
+    github: "https://github.com/Vishi2006/placement-management",
+    demo: "https://placement-management-system.vercel.app/",
+    accent: "#f97316",
+  },
+  {
+    id: "02",
+    title: "Habit Tracker",
+    description:
+      "Daily habit tracking application with streak counting, progress visualization, and persistent data storage for building consistent routines.",
+    tags: ["React", "Context API", "LocalStorage"],
+    image: "/project5.png",
+    github: "https://github.com/Vishi2006/habit-tracker",
+    demo: "https://habit-tracker-pulkit.netlify.app/",
+    accent: "#a78bfa",
+  },
+  {
+    id: "03",
+    title: "Real Time Restaurant Ordering System",
+    description:
+      "Full-stack real-time ordering platform with live kitchen updates, QR table scanning, and order tracking dashboard.",
+    tags: ["React", "Node.js", "Socket.io", "MongoDB"],
+    image: "/project1.png",
+    github: "https://github.com/Vishi2006/Vishi-Foods",
+    demo: "https://vishfoodsmenu.vercel.app/table/1",
+    accent: "#39ff14",
+  },
+  {
+    id: "04",
+    title: "React Router Learning Blog",
+    description:
+      "Interactive developer blog built to showcase React Router v6 patterns — nested routes, loaders, and data fetching.",
+    tags: ["React", "React Router", "Tailwind"],
+    image: "/project2.png",
+    github: "https://github.com/Vishi2006/react-router-blog",
+    demo: "https://react-router-blog-pulkit.netlify.app/",
+    accent: "#00ccff",
+  },
+  {
+    id: "05",
+    title: "Task Manager — To Do List",
+    description:
+      "Minimalist productivity app with drag-and-drop tasks, local persistence, and priority sorting — zero dependencies.",
+    tags: ["JavaScript", "HTML", "CSS"],
+    image: "/project3.png",
+    github: "https://github.com/Vishi2006/To-Do-List-JS-project",
+    demo: "https://vishi2006.github.io/To-Do-List-JS-project/",
+    accent: "#ff6b6b",
+  },
+  {
+    id: "06",
+    title: "Live Weather App",
+    description:
+      "Real-time weather application with animated weather icons, 5-day forecast, and geolocation-based auto-detection.",
+    tags: ["JavaScript", "OpenWeather API", "CSS"],
+    image: "/project4.png",
+    github: "https://github.com/Vishi2006/weather-app-in-JS",
+    demo: "https://vishi2006.github.io/weather-app-in-JS/",
+    accent: "#ffbe0b",
+  },
+];
 
-  const projects = [
-    {
-      title: 'Real Time Restaurant Ordering System',
-      image: '/project1.png',
-      github: 'https://github.com/Vishi2006/Vishi-Foods',
-      demo: 'https://vishfoodsmenu.vercel.app/table/1'
-    },
-    {
-      title: 'React Router Learning Blog',
-      image: '/project2.png',
-      github: 'https://github.com/Vishi2006/react-router-blog',
-      demo: 'https://react-router-blog-pulkit.netlify.app/'
-    },
-    {
-      title: 'To Do List',
-      image: '/project3.png',
-      github: 'https://github.com/Vishi2006/To-Do-List-JS-project',
-      demo: 'https://vishi2006.github.io/To-Do-List-JS-project/'
-    },
-    {
-      title: 'Weather App',
-      image: '/project4.png',
-      github: 'https://github.com/Vishi2006/weather-app-in-JS',
-      demo: 'https://vishi2006.github.io/weather-app-in-JS/'
-    }
-  ];
+/* ── Single Project Card ───────────────────────────────────────── */
+const ProjectCard = ({ project }) => {
+  const cardRef    = useRef(null);
+  const imgRef     = useRef(null);
+  const overlayRef = useRef(null);
+
+  useEffect(() => {
+    const card    = cardRef.current;
+    const img     = imgRef.current;
+    const overlay = overlayRef.current;
+    if (!card || !img || !overlay) return;
+
+    // Start overlay invisible
+    gsap.set(overlay, { opacity: 0 });
+
+    const enter = () => {
+      gsap.to(img,     { scale: 1.06, duration: 0.5, ease: "power2.out" });
+      gsap.to(overlay, { opacity: 1,  duration: 0.35 });
+    };
+    const leave = () => {
+      gsap.to(img,     { scale: 1,   duration: 0.5, ease: "power2.inOut" });
+      gsap.to(overlay, { opacity: 0, duration: 0.3 });
+    };
+
+    card.addEventListener("mouseenter", enter);
+    card.addEventListener("mouseleave", leave);
+    return () => {
+      card.removeEventListener("mouseenter", enter);
+      card.removeEventListener("mouseleave", leave);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen w-full font-[Doto] mb-12 sm:mb-20 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Heading - Right Aligned */}
-        <div className="mb-8 sm:mb-12 flex flex-col items-end">
-          <h1 className='text-3xl sm:text-4xl md:text-5xl text-right font-extrabold uppercase bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300 cursor-pointer'>
-            My Projects
-          </h1>
-          {/* Consistent green underline bar */}
-          <div className="h-1 w-80 bg-green-500/70 mt-2"></div>
+    <div
+      ref={cardRef}
+      className="flex-shrink-0 cursor-none select-none"
+      style={{ width: "clamp(280px, 85vw, 580px)", marginRight: "clamp(1.5rem, 4vw, 3rem)" }}
+      data-cursor-hover
+    >
+      {/* Image container */}
+      <div className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-5 border border-white/[0.06]"
+        style={{ height: "clamp(160px, 50vw, 380px)" }}>
+        <img
+          ref={imgRef}
+          src={project.image}
+          alt={project.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
+
+        {/* Hover overlay */}
+        <div
+          ref={overlayRef}
+          className="absolute inset-0 flex items-center justify-center gap-4"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 100%)" }}
+        >
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-[Doto] font-extrabold uppercase text-[0.75rem] sm:text-[0.8rem] tracking-[0.2em] px-6 sm:px-8 py-2.5 sm:py-3 rounded-full border-[1.5px] border-white/50 text-white hover:border-white/90 hover:bg-white/10 transition-all duration-300 hover:scale-105"
+          >
+            GitHub
+          </a>
+          <a
+            href={project.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-[Doto] font-extrabold uppercase text-[0.75rem] sm:text-[0.8rem] tracking-[0.2em] px-6 sm:px-8 py-2.5 sm:py-3 rounded-full transition-all duration-300 text-black hover:scale-105 hover:shadow-[0_0_24px_rgba(0,255,0,0.3)]"
+            style={{ background: project.accent }}
+          >
+            Live Demo ↗
+          </a>
         </div>
-        
-        {/* Projects Grid - 1 column on mobile, 2 columns on desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-          {projects.map((project, index) => (
-            <div
-              key={index}
-              className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden group cursor-pointer bg-gray-900"
-              onMouseEnter={() => setHoveredProject(index)}
-              onMouseLeave={() => setHoveredProject(null)}
-            >
-              {/* Project Image */}
-              <img
-                src={project.image}
-                alt={project.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
 
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-              {/* Project Title - Appears on hover */}
-              {hoveredProject === index && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <h3 
-                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black px-4 sm:px-8 text-center leading-tight"
-                    style={{
-                      color: 'white',
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
-                      animation: 'fadeIn 0.3s ease-out'
-                    }}
-                  >
-                    {project.title}
-                  </h3>
-                </div>
-              )}
-
-              {/* Small dot indicator */}
-              <div className="absolute top-4 sm:top-6 left-4 sm:left-6 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
-              
-              {/* Project label text at top */}
-              <div className="absolute top-4 sm:top-6 left-8 sm:left-12 text-sm sm:text-lg md:text-xl font-extrabold text-white max-w-[80%] truncate">
-                {project.title}
-              </div>
-
-              {/* Links - Bottom of box, appear on hover */}
-              {hoveredProject === index && (
-                <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 flex flex-col sm:flex-row gap-2 sm:gap-4 z-10">
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-black text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-bold text-center text-sm sm:text-base"
-                    style={{ animation: 'slideUp 0.3s ease-out' }}
-                  >
-                    GITHUB
-                  </a>
-                  <a
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-bold text-center text-sm sm:text-base"
-                    style={{ 
-                      backgroundColor: 'darkgreen',
-                      color: '#000',
-                      animation: 'slideUp 0.3s ease-out 0.1s backwards'
-                    }}
-                  >
-                    LIVE DEMO
-                  </a>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* Number badge */}
+        <span
+          className="absolute top-4 right-4 font-[Doto] font-extrabold text-4xl leading-none select-none pointer-events-none"
+          style={{ color: project.accent, opacity: 0.2 }}
+        >
+          {project.id}
+        </span>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
+      {/* Meta */}
+      <div>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="font-mono text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-full border"
+              style={{
+                borderColor: `${project.accent}50`,
+                color:        project.accent,
+                background:  `${project.accent}10`,
+              }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <h3
+          className="font-[Doto] font-extrabold uppercase text-white mb-2 leading-tight"
+          style={{ fontSize: "clamp(1.1rem, 2.2vw, 1.7rem)" }}
+        >
+          {project.title}
+        </h3>
+        <p className="font-mono text-sm text-white/40 leading-relaxed line-clamp-3">
+          {project.description}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+/* ── Projects Section (Horizontal Pin) ─────────────────────────── */
+const Projects = () => {
+  const sectionRef = useRef(null);
+  const pinRef     = useRef(null);
+  const trackRef   = useRef(null);
+  const titleRef   = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+
+      /* Title reveal */
+      gsap.fromTo(
+        titleRef.current,
+        { clipPath: "inset(0 100% 0 0)", opacity: 0 },
+        {
+          clipPath: "inset(0 0% 0 0)", opacity: 1,
+          duration: 1.1, ease: "power4.out",
+          scrollTrigger: { trigger: titleRef.current, start: "top 88%" },
         }
-        
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      );
+
+      /* Horizontal scroll — calculate at refresh time */
+      const getScrollAmount = () =>
+        -(trackRef.current.scrollWidth - pinRef.current.offsetWidth);
+
+      gsap.to(trackRef.current, {
+        x: getScrollAmount,
+        ease: "none",
+        scrollTrigger: {
+          trigger:          pinRef.current,
+          start:            "top top",
+          end:              () => `+=${Math.abs(getScrollAmount())}`,
+          scrub:            1,
+          pin:              true,
+          anticipatePin:    1,
+          invalidateOnRefresh: true,
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div ref={sectionRef} className="relative bg-[#050505]">
+
+      {/* Static header — sits above pinned region */}
+      <div className="w-full max-w-[1400px] mx-auto section-container pt-28 pb-8">
+        <div className="flex items-center gap-4 mb-6">
+          <span className="font-mono text-xs tracking-[0.3em] text-green-500/50 uppercase">
+            // selected.work
+          </span>
+          <div className="flex-1 h-px bg-green-500/10" />
+        </div>
+        <h2
+          ref={titleRef}
+          className="font-[Doto] font-extrabold uppercase"
+          style={{
+            fontSize: "clamp(2.4rem, 5.5vw, 5rem)",
+            lineHeight: 0.95,
+            background: "linear-gradient(135deg, #ffffff 40%, #39ff14 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            clipPath: "inset(0 100% 0 0)",
+            opacity: 0,
+          }}
+        >
+          My Projects
+        </h2>
+      </div>
+
+      {/* Pinned horizontal scroll viewport */}
+      <div
+        ref={pinRef}
+        className="relative w-full overflow-hidden"
+        style={{ height: "100vh" }}
+      >
+        {/* Card track */}
+        <div
+          ref={trackRef}
+          className="absolute top-0 left-0 h-full flex items-center pl-6 sm:pl-10 md:pl-16 lg:pl-[88px] xl:pl-[112px] pr-4 sm:pr-6 md:pr-12 lg:pr-[40px] xl:pr-[60px]"
+          style={{ willChange: "transform" }}
+        >
+          {PROJECTS.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+
+        {/* Hint */}
+        <p className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs tracking-widest text-white/20 uppercase select-none">
+          scroll to explore →
+        </p>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent" />
     </div>
   );
 };

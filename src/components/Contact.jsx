@@ -1,306 +1,230 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import { FiGithub, FiLinkedin, FiTwitter, FiMail, FiArrowUpRight } from "react-icons/fi";
 
+gsap.registerPlugin(ScrollTrigger);
+
+const SOCIAL_LINKS = [
+  { name: "GitHub",   icon: FiGithub,   url: "https://github.com/Vishi2006",          color: "#fff"    },
+  { name: "LinkedIn", icon: FiLinkedin, url: "https://linkedin.com/in/pulkit-khowal", color: "#0077b5" },
+  { name: "Twitter",  icon: FiTwitter,  url: "https://twitter.com/the_pulkit_2006",   color: "#1da1f2" },
+  { name: "Email",    icon: FiMail,     url: "mailto:pulkitkhowal2006@gmail.com",      color: "#39ff14" },
+];
+
+const TerminalInput = ({ label, type = "text", name, value, onChange, placeholder, rows }) => (
+  <div className="contact-field-group">
+    <label className="block font-mono text-xs tracking-[0.3em] uppercase text-green-500/55 mb-4 sm:mb-5">
+      <span className="text-green-500 mr-2">$</span>{label}
+    </label>
+    {rows ? (
+      <textarea
+        name={name} value={value} onChange={onChange}
+        rows={rows} placeholder={placeholder} required
+        className="contact-input"
+      />
+    ) : (
+      <input
+        type={type} name={name} value={value} onChange={onChange}
+        placeholder={placeholder} required className="contact-input"
+      />
+    )}
+  </div>
+);
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
-  const [errorMessage, setErrorMessage] = useState('');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isLoading, setIsLoading]   = useState(false);
+  const [status, setStatus]         = useState(null);
+  const [errorMsg, setErrorMsg]     = useState('');
+  const sectionRef  = useRef(null);
+  const titleRef    = useRef(null);
+  const subTitleRef = useRef(null);
+  const formRef     = useRef(null);
+  const panelRef    = useRef(null);
+  const btnRef      = useRef(null);
 
-
-  const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID?.trim() || '';
+  const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID?.trim()  || '';
   const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID?.trim() || '';
-  const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.trim() || '';
-
-  // Initialize EmailJS on component mount
-//   useEffect(() => {
-//     if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY.length > 0) {
-//       emailjs.init(EMAILJS_PUBLIC_KEY);
-//       // Debug: Log configuration status (only in development)
-//       if (import.meta.env.DEV) {
-//         console.log('✅ EmailJS initialized');
-//       }
-//     } else if (import.meta.env.DEV) {
-//       console.warn('⚠️ EmailJS Public Key not found. Check your .env file.');
-//     }
-//   }, [EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]);
+  const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.trim()  || '';
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    // Clear status when user starts typing
-    if (submitStatus) {
-      setSubmitStatus(null);
-      setErrorMessage('');
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (status) { setStatus(null); setErrorMsg(''); }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if EmailJS is configured
     if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-      setSubmitStatus('error');
-      const missing = [];
-      if (!EMAILJS_SERVICE_ID) missing.push('VITE_EMAILJS_SERVICE_ID');
-      if (!EMAILJS_TEMPLATE_ID) missing.push('VITE_EMAILJS_TEMPLATE_ID');
-      if (!EMAILJS_PUBLIC_KEY) missing.push('VITE_EMAILJS_PUBLIC_KEY');
-      
-      setErrorMessage(`EmailJS not configured. Missing in .env: ${missing.join(', ')}. Please check your .env file and restart the dev server.`);
-      console.error('EmailJS Configuration Error:', {
-        SERVICE_ID: EMAILJS_SERVICE_ID ? 'Set' : 'Missing',
-        TEMPLATE_ID: EMAILJS_TEMPLATE_ID ? 'Set' : 'Missing',
-        PUBLIC_KEY: EMAILJS_PUBLIC_KEY ? 'Set' : 'Missing'
-      });
-      return;
+      setStatus('error'); setErrorMsg('EmailJS not configured. Check .env file.'); return;
     }
-    
-    // Form validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      setSubmitStatus('error');
-      setErrorMessage('Please fill in all fields');
-      return;
+      setStatus('error'); setErrorMsg('Please fill in all fields.'); return;
     }
-
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setSubmitStatus('error');
-      setErrorMessage('Please enter a valid email address');
-      return;
+      setStatus('error'); setErrorMsg('Invalid email address.'); return;
     }
-
-    setIsLoading(true);
-    setSubmitStatus(null);
-    setErrorMessage('');
-
+    setIsLoading(true); setStatus(null); setErrorMsg('');
     try {
-      const response = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-          to_name: 'Pulkit Khowal', // Your name
-        },
+      const res = await emailjs.send(
+        EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID,
+        { from_name: formData.name, from_email: formData.email, message: formData.message, to_name: 'Pulkit Khowal' },
         EMAILJS_PUBLIC_KEY
       );
-
-      // Success
-      if (response.status === 200) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-        setErrorMessage('');
-      }
-    } catch (error) {
-      // Detailed error handling
-      setSubmitStatus('error');
-      console.error('EmailJS Error Details:', {
-        error,
-        status: error.status,
-        text: error.text,
-        message: error.message
-      });
-      
-      // Provide helpful error messages based on error type
-      if (error.status === 0) {
-        setErrorMessage('Network error. Please check your internet connection and try again.');
-      } else if (error.text) {
-        // EmailJS specific error messages
-        if (error.text.includes('Invalid service ID') || error.text.includes('Service not found')) {
-          setErrorMessage('Invalid Service ID. Please check VITE_EMAILJS_SERVICE_ID in your .env file.');
-        } else if (error.text.includes('Invalid template ID') || error.text.includes('Template not found')) {
-          setErrorMessage('Invalid Template ID. Please check VITE_EMAILJS_TEMPLATE_ID in your .env file.');
-        } else if (error.text.includes('Invalid public key') || error.text.includes('Unauthorized')) {
-          setErrorMessage('Invalid Public Key. Please check VITE_EMAILJS_PUBLIC_KEY in your .env file.');
-        } else {
-          setErrorMessage(`Error: ${error.text}`);
-        }
-      } else if (error.message) {
-        setErrorMessage(`Error: ${error.message}`);
-      } else {
-        setErrorMessage('Failed to send message. Please check your EmailJS configuration in .env file and restart the dev server.');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+      if (res.status === 200) { setStatus('success'); setFormData({ name: '', email: '', message: '' }); }
+    } catch (err) {
+      setStatus('error');
+      setErrorMsg(err.text || err.message || 'Failed to send. Please try again.');
+    } finally { setIsLoading(false); }
   };
 
-  const socialLinks = [
-    {
-      name: 'GitHub',
-      icon: '💻',
-      url: 'https://github.com/Vishi2006'
-    },
-    {
-      name: 'LinkedIn',
-      icon: '💼',
-      url: 'https://linkedin.com/in/pulkit-khowal'
-    },
-    {
-      name: 'Twitter',
-      icon: '🐦',
-      url: 'https://twitter.com/the_pulkit_2006'
-    },
-    {
-      name: 'Email',
-      icon: '✉️',
-      url: 'mailto:pulkitkhowal2006@gmail.com'
-    }
-  ];
+  /* Magnetic submit button */
+  useEffect(() => {
+    const btn = btnRef.current;
+    if (!btn) return;
+    const onMove  = (e) => {
+      const rect = btn.getBoundingClientRect();
+      gsap.to(btn, { x: (e.clientX - rect.left - rect.width / 2) * 0.35, y: (e.clientY - rect.top - rect.height / 2) * 0.35, duration: 0.4, ease: "power2.out" });
+    };
+    const onLeave = () => gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1,0.5)" });
+    btn.addEventListener("mousemove", onMove);
+    btn.addEventListener("mouseleave", onLeave);
+    return () => { btn.removeEventListener("mousemove", onMove); btn.removeEventListener("mouseleave", onLeave); };
+  }, []);
+
+  /* Scroll reveals */
+  useEffect(() => {
+    gsap.set(titleRef.current,    { clipPath: "inset(0 100% 0 0)", opacity: 0 });
+    gsap.set(subTitleRef.current, { opacity: 0, y: 30 });
+    gsap.set(formRef.current,     { opacity: 0, x: -40 });
+    gsap.set(panelRef.current,    { opacity: 0, x:  40 });
+
+    const ctx = gsap.context(() => {
+      gsap.to(titleRef.current, {
+        clipPath: "inset(0 0% 0 0)", opacity: 1, duration: 1.3, ease: "power4.out",
+        scrollTrigger: { trigger: titleRef.current, start: "top 85%" },
+      });
+      gsap.to(subTitleRef.current, {
+        opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+        scrollTrigger: { trigger: subTitleRef.current, start: "top 87%" },
+      });
+      gsap.to(formRef.current, {
+        opacity: 1, x: 0, duration: 1, ease: "power3.out",
+        scrollTrigger: { trigger: formRef.current, start: "top 85%" },
+      });
+      gsap.to(panelRef.current, {
+        opacity: 1, x: 0, duration: 1, ease: "power3.out",
+        scrollTrigger: { trigger: panelRef.current, start: "top 85%" },
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div className="font-[Doto] min-h-screen bg-black text-white flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl w-full flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-        
-        {/* Left Side - Contact Form */}
-        <div className="w-full lg:w-[60%]">
-          <div className="mb-6 sm:mb-8">
-            <h1 className='text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300 cursor-pointer'>
-              Get in touch
-            </h1>
-            {/* Consistent green underline bar */}
-            <div className="h-1 w-96 bg-green-500/70 mt-2"></div>
-            <p className="text-gray-400 text-base sm:text-lg md:text-xl font-extrabold uppercase mt-4">
-              <span className="text-[#00ff00] font-mono">{'> '}</span>
-              Have a project in mind? Any suggestion? Let's connect together!
-            </p>
-          </div>
+    <div ref={sectionRef} className="relative w-full bg-[#050505] overflow-hidden py-36 section-container">
 
-          {/* Contact Form */}
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            {/* Name Input */}
-            <div>
-              <label htmlFor="name" className="block text-lg sm:text-xl font-extrabold text-[#00ff00] mb-2">
-                NAME
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full bg-zinc-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:border-[#00ff00] focus:outline-none transition-colors duration-200"
-                placeholder="Your name"
-              />
-            </div>
+      {/* BG orbs */}
+      <div className="absolute bottom-0 right-0 w-[700px] h-[700px] pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(0,255,0,0.05) 0%, transparent 70%)", filter: "blur(80px)" }} />
+      <div className="absolute top-1/4 left-[-100px] w-[500px] h-[500px] pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(0,180,0,0.03) 0%, transparent 70%)", filter: "blur(60px)" }} />
 
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-lg sm:text-xl font-extrabold text-[#00ff00] mb-2">
-                EMAIL
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full bg-zinc-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:border-[#00ff00] focus:outline-none transition-colors duration-200"
-                placeholder="your.email@example.com"
-              />
-            </div>
+      <div className="relative z-10 max-w-[1400px] mx-auto w-full">
 
-            {/* Message Input */}
-            <div>
-              <label htmlFor="message" className="block text-lg sm:text-xl font-extrabold text-[#00ff00] mb-2">
-                MESSAGE
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows="6"
-                required
-                className="w-full bg-zinc-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white focus:border-[#00ff00] focus:outline-none transition-colors duration-200 resize-none"
-                placeholder="Tell me about your project/idea or any suggestions...."
-              />
-            </div>
-
-            {/* Error/Success Message */}
-            {submitStatus === 'error' && errorMessage && (
-              <div className="bg-red-900/50 border-2 border-red-500 rounded-lg p-4 text-red-200 text-sm sm:text-base">
-                <p className="font-bold mb-1">Error:</p>
-                <p>{errorMessage}</p>
-              </div>
-            )}
-            
-            {submitStatus === 'success' && (
-              <div className="bg-green-900/50 border-2 border-green-500 rounded-lg p-4 text-green-200 text-sm sm:text-base">
-                <p className="font-bold">✓ Message sent successfully! I'll get back to you soon.</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full bg-green-500/70 text-black py-3 sm:py-4 rounded-lg hover:bg-green-600/70 transition-colors duration-200 text-xl sm:text-2xl font-extrabold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-                submitStatus === 'success' ? 'bg-green-600' : submitStatus === 'error' ? 'bg-red-600/70' : ''
-              }`}
-            >
-              {isLoading ? 'SENDING...' : 'SEND MESSAGE'}
-            </button>
-          </form>
+        {/* Label */}
+        <div className="flex items-center gap-4 mb-8">
+          <span className="font-mono text-xs tracking-[0.35em] text-green-500/50 uppercase">// contact.init()</span>
+          <div className="flex-1 h-px bg-green-500/10" />
         </div>
 
-        {/* Right Side - Social Links */}
-        <div className="w-full lg:w-[40%]">
-          <div className="mb-6 sm:mb-8">
-            <h1 className='mb-3 sm:mb-5 text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300 cursor-pointer'>
-              Connect with me
-            </h1>
-            {/* Consistent green underline bar */}
-            <div className="h-1 w-96 bg-green-500/70 mt-2"></div>
-            <p className="text-gray-400 uppercase text-base sm:text-lg md:text-xl font-extrabold mt-4">
-              <span className="text-[#00ff00] font-mono">{'> '}</span>
-              Find me on these platforms
-            </p>
-          </div>
+        {/* Bold closing headline */}
+        <h2
+          ref={titleRef}
+          className="font-[Doto] font-extrabold uppercase mb-8 lg:mb-12"
+          style={{
+            fontSize: "clamp(2.4rem, 5.5vw, 5rem)", lineHeight: 0.95,
+            background: "linear-gradient(135deg, #ffffff 35%, #39ff14 100%)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Let's Build<br />Something<br />Crazy Together
+        </h2>
 
-          {/* Social Links */}
-          <div className="space-y-3 sm:space-y-4 font-[Doto]">
-            {socialLinks.map((social, index) => (
-              <a
-                key={index}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 sm:gap-4 bg-zinc-900 border-2 border-gray-700 rounded-lg px-4 sm:px-6 py-3 sm:py-4 hover:border-[#00ff00] hover:bg-gray-800 transition-all duration-200 group"
-              >
-                <span className="text-2xl sm:text-3xl">{social.icon}</span>
-                <span className="text-base sm:text-lg uppercase font-extrabold text-white group-hover:text-[#00ff00] transition-colors duration-200">
-                  {social.name}
-                </span>
-                <span className="ml-auto text-[#00ff00] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  →
-                </span>
-              </a>
-            ))}
-          </div>
+        <p ref={subTitleRef} className="font-mono text-base sm:text-lg text-white/35 max-w-xl mb-20 leading-relaxed">
+          <span className="text-green-500">{">"}</span> Have an idea or a project in mind? Drop a message — I'm always excited to collaborate.
+        </p>
 
-          {/* Additional Info */}
-          <div className="mt-6 sm:mt-8 font-[Doto] bg-gray-900/50 border-2 border-green-500/30 rounded-lg p-4 sm:p-6 uppercase">
-            <p className="text-gray-400 text-lg sm:text-xl font-extrabold">
-              <span className="text-[#00ff00]">$ </span>
-              response time: <span className="text-white">24 hours</span>
-            </p>
-            <p className="text-gray-400 text-lg sm:text-xl font-extrabold mt-2">
-              <span className="text-[#00ff00]">$ </span>
-              availability: <span className="text-white">Open to freelance</span>
-            </p>
+        <div className="grid lg:grid-cols-[1.3fr_1fr] gap-14 lg:gap-24">
+
+          {/* Form */}
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-9 lg:space-y-10">
+            <TerminalInput label="name"    name="name"    value={formData.name}    onChange={handleChange} placeholder="Your name..."                        />
+            <TerminalInput label="email"   type="email"   name="email"   value={formData.email}   onChange={handleChange} placeholder="your.email@domain.com"            />
+            <TerminalInput label="message" name="message" value={formData.message} onChange={handleChange} placeholder="Tell me about your project or idea..." rows={7}   />
+
+            {status === 'error' && errorMsg && (
+              <div className="flex items-start gap-3 border border-red-500/30 bg-red-500/[0.05] rounded-2xl px-5 py-4">
+                <span className="text-red-400 font-mono text-xs mt-0.5">✗</span>
+                <p className="font-mono text-xs text-red-400">{errorMsg}</p>
+              </div>
+            )}
+            {status === 'success' && (
+              <div className="flex items-center gap-3 border border-green-500/30 bg-green-500/[0.05] rounded-2xl px-5 py-4">
+                <span className="text-green-400 font-mono text-xs">✓</span>
+                <p className="font-mono text-xs text-green-400">Transmission successful! I'll get back to you within 24 hours.</p>
+              </div>
+            )}
+
+            <div className="pt-3">
+              <button ref={btnRef} type="submit" disabled={isLoading} className="hero-cta-primary">
+                <span>{isLoading ? 'Transmitting...' : 'Transmit Message'}</span>
+                {!isLoading && <FiArrowUpRight size={20} />}
+              </button>
+            </div>
+          </form>
+
+          {/* Right panel */}
+          <div ref={panelRef} className="space-y-10">
+            <div className="contact-info-card">
+              <p className="font-mono text-xs tracking-widest text-green-500/55 uppercase mb-10 sm:mb-12">// system.info</p>
+              {[
+                ["response_time", "< 24 hours"],
+                ["status",        "open_to_freelance"],
+                ["timezone",      "IST (UTC+5:30)"],
+                ["mode",          "building_cool_things"],
+              ].map(([key, val]) => (
+                <div key={key} className="flex items-center gap-4 py-5 sm:py-6 border-b border-green-500/[0.07] last:border-0">
+                  <span className="text-green-500 font-mono text-xs">$</span>
+                  <span className="font-mono text-xs text-white/35 min-w-[160px]">{key}:</span>
+                  <span className="font-mono text-xs text-white/80">{val}</span>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <p className="font-mono text-xs tracking-[0.3em] uppercase text-green-500/45 mb-6 sm:mb-8">// find me on</p>
+              <div className="grid grid-cols-2 gap-3">
+                {SOCIAL_LINKS.map(({ name, icon: Icon, url, color }) => (
+                  <a key={name} href={url} target="_blank" rel="noopener noreferrer"
+                    data-cursor-hover className="contact-social-link group">
+                    <Icon size={18} style={{ color }} className="flex-shrink-0 opacity-65 group-hover:opacity-100 transition-opacity duration-300" />
+                    <span className="font-[Doto] font-bold uppercase text-xs tracking-widest text-white/45 group-hover:text-white/90 transition-colors duration-300">
+                      {name}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-28 pt-10 border-t border-green-500/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="font-mono text-xs text-white/20 tracking-widest uppercase">© 2025 Pulkit Khowal — Built in the Void</p>
+          <p className="font-mono text-xs text-green-500/30 tracking-widest uppercase">React · GSAP · Lenis · Tailwind</p>
         </div>
       </div>
     </div>
