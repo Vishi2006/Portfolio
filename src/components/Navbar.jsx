@@ -12,18 +12,17 @@ const Navbar = () => {
 
   const handleResume = () => {
     const link = document.createElement("a");
-    link.href = "/Pulkit-Khowal-Resume.pdf";
+    link.href = "/Pulkit_Khowal_Resume.pdf";
     link.download = "Pulkit_Khowal_Resume.pdf";
     link.click();
   };
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
-        scrolled
-          ? "py-3 bg-black/70 backdrop-blur-xl border-b border-green-500/10 shadow-[0_4px_30px_rgba(0,255,0,0.04)]"
-          : "py-4 bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${scrolled
+        ? "py-3 bg-black/70 backdrop-blur-xl border-b border-green-500/10 shadow-[0_4px_30px_rgba(0,255,0,0.04)]"
+        : "py-4 bg-transparent"
+        }`}
     >
       <div className="max-w-[1400px] mx-auto section-container flex items-center justify-between">
         {/* Logo */}
