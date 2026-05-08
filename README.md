@@ -70,7 +70,6 @@ portfolio/
 ## 👤 Author
 
 **Pulkit Khowal**
-- Portfolio: [Your Portfolio URL]
 - GitHub: [@Vishi2006](https://github.com/Vishi2006)
 - LinkedIn: [Pulkit Khowal](https://linkedin.com/in/pulkit-khowal)
 

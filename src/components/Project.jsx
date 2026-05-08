@@ -11,9 +11,9 @@ const PROJECTS = [
     description:
       "Comprehensive campus recruitment platform with student profiles, job postings, application tracking, and interview scheduling for efficient hiring workflow.",
     tags: ["React", "Node.js", "MongoDB", "Express"],
-    image: "/project6.png",
-    github: "https://github.com/Vishi2006/placement-management",
-    demo: "https://placement-management-system.vercel.app/",
+    image: "https://images.unsplash.com/photo-1516031190212-da133013de50?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    github: "https://github.com/Vishi2006/placement-management-system",
+    demo: "http://placement-management-system-jec.vercel.app/login",
     accent: "#f97316",
   },
   {
@@ -22,9 +22,9 @@ const PROJECTS = [
     description:
       "Daily habit tracking application with streak counting, progress visualization, and persistent data storage for building consistent routines.",
     tags: ["React", "Context API", "LocalStorage"],
-    image: "/project5.png",
+    image: "https://images.unsplash.com/photo-1626984260017-356d1189ec72?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     github: "https://github.com/Vishi2006/habit-tracker",
-    demo: "https://habit-tracker-pulkit.netlify.app/",
+    demo: "https://habit-tracker-pulkit.vercel.app/",
     accent: "#a78bfa",
   },
   {
@@ -75,13 +75,13 @@ const PROJECTS = [
 
 /* ── Single Project Card ───────────────────────────────────────── */
 const ProjectCard = ({ project }) => {
-  const cardRef    = useRef(null);
-  const imgRef     = useRef(null);
+  const cardRef = useRef(null);
+  const imgRef = useRef(null);
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    const card    = cardRef.current;
-    const img     = imgRef.current;
+    const card = cardRef.current;
+    const img = imgRef.current;
     const overlay = overlayRef.current;
     if (!card || !img || !overlay) return;
 
@@ -89,11 +89,11 @@ const ProjectCard = ({ project }) => {
     gsap.set(overlay, { opacity: 0 });
 
     const enter = () => {
-      gsap.to(img,     { scale: 1.06, duration: 0.5, ease: "power2.out" });
-      gsap.to(overlay, { opacity: 1,  duration: 0.35 });
+      gsap.to(img, { scale: 1.06, duration: 0.5, ease: "power2.out" });
+      gsap.to(overlay, { opacity: 1, duration: 0.35 });
     };
     const leave = () => {
-      gsap.to(img,     { scale: 1,   duration: 0.5, ease: "power2.inOut" });
+      gsap.to(img, { scale: 1, duration: 0.5, ease: "power2.inOut" });
       gsap.to(overlay, { opacity: 0, duration: 0.3 });
     };
 
@@ -168,8 +168,8 @@ const ProjectCard = ({ project }) => {
               className="font-mono text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-full border"
               style={{
                 borderColor: `${project.accent}50`,
-                color:        project.accent,
-                background:  `${project.accent}10`,
+                color: project.accent,
+                background: `${project.accent}10`,
               }}
             >
               {tag}
@@ -193,9 +193,9 @@ const ProjectCard = ({ project }) => {
 /* ── Projects Section (Horizontal Pin) ─────────────────────────── */
 const Projects = () => {
   const sectionRef = useRef(null);
-  const pinRef     = useRef(null);
-  const trackRef   = useRef(null);
-  const titleRef   = useRef(null);
+  const pinRef = useRef(null);
+  const trackRef = useRef(null);
+  const titleRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -219,12 +219,12 @@ const Projects = () => {
         x: getScrollAmount,
         ease: "none",
         scrollTrigger: {
-          trigger:          pinRef.current,
-          start:            "top top",
-          end:              () => `+=${Math.abs(getScrollAmount())}`,
-          scrub:            1,
-          pin:              true,
-          anticipatePin:    1,
+          trigger: pinRef.current,
+          start: "top top",
+          end: () => `+=${Math.abs(getScrollAmount())}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       });
